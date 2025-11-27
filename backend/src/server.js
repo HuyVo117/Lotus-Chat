@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import userRoute from './routes/userRoute.js';
 import { protectedRoute } from './middlewares/authMiddleware.js';
 import cors from 'cors';
+import friendRoute from './routes/friendRoute.js';
 
 
 dotenv.config();
@@ -19,6 +20,8 @@ app.use(cookieParser());
 app.use(cors({origin: process.env.CLIENT_URL, credentials: true}));
 // public routes
 app.use('/api/auth', authRoute);
+
+app.use('/api/friends', friendRoute);
 
 //private routes
 app.use(protectedRoute) // su dung middleware xac thuc cho cac route sau do
