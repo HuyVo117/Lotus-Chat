@@ -100,7 +100,7 @@ export const signIn = async (req, res) => {
     // trả access token về trong res
     return res
       .status(200)
-      .json({ message: `User ${user.displayName} đã logged in!`, accessToken });
+      .json({ message: ` ${user.username} đã logged in!`, accessToken });
   } catch (error) {
     console.error("Lỗi khi gọi signIn", error);
     return res.status(500).json({ message: "Lỗi hệ thống" });
@@ -118,6 +118,7 @@ export const signOut = async (req, res) => {
 
       // xoá cookie
       res.clearCookie("refreshToken");
+      
     }
 
     return res.sendStatus(204);

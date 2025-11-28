@@ -21,24 +21,17 @@ app.use(cors({origin: process.env.CLIENT_URL, credentials: true}));
 // public routes
 app.use('/api/auth', authRoute);
 
-app.use('/api/friends', friendRoute);
 
-//private routes
-app.use(protectedRoute) // su dung middleware xac thuc cho cac route sau do
-app.use('/api/users', userRoute); //protected route
 
-const start = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  }
-};
+// private routes
+app.use(protectedRoute);
+app.use("/api/users", userRoute);
+app.use("/api/friends", friendRoute);
+// app.use("/api/messages", messageRoute);
+// app.use("/api/conversations", conversationRoute);
 
-start();
-
-export default app;
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`server bắt đầu trên cổng ${PORT}`);
+  });
+});

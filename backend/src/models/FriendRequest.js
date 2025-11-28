@@ -1,31 +1,32 @@
 import mongoose from "mongoose";
 
 const friendRequestSchema = new mongoose.Schema(
-    {
-        from: {   
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",    
-            required: true,
-        },
-        to: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
-        message:{
-            type: String,
-            maxLength: 300,
-        }
-
+  {
+    from: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    { timestamps: true }
+    to: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    message: {
+      type: String,
+      maxlength: 300,
+    },
+  },
+  {
+    timestamps: true,
+  }
 );
 
-friendRequestSchema.index({ from: 1, to: 1 }, { unique: true }); // tao index doc nhat cho from va to
+friendRequestSchema.index({ from: 1, to: 1 }, { unique: true });
 
-friendRequestSchema.index({ to: 1, createdAt: -1 }); // de lay danh sach request gui den
-friendRequestSchema.index({ from: 1, createdAt: -1 }); // de lay danh sach request da gui
+friendRequestSchema.index({ from: 1 });
 
+friendRequestSchema.index({ to: 1 });
 
 const FriendRequest = mongoose.model("FriendRequest", friendRequestSchema);
 export default FriendRequest;
