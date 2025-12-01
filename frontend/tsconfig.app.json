@@ -24,11 +24,14 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    // shadcn
+    // Alias
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    // 🔥 Tắt cảnh báo deprecated TS 6
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src"]
 }
