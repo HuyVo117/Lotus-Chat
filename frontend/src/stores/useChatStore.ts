@@ -219,7 +219,7 @@ export const useChatStore = create<ChatState>()(
           );
 
           get().addConvo(conversation);
-
+// sau khi join conversation thì mới nhận đc tin nhắn 
           useSocketStore
             .getState()
             .socket?.emit("join-conversation", conversation._id);
