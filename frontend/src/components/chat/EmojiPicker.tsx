@@ -1,8 +1,9 @@
-import { useThemeStore } from "@/stores/useThemeStore";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Smile } from "lucide-react";
-import Picker from "@emoji-mart/react";
+import { useEffect, useRef } from "react";
+import { Picker } from "emoji-mart";
 import data from "@emoji-mart/data";
+import { Smile } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { useThemeStore } from "@/stores/useThemeStore";
 
 interface EmojiPickerProps {
   onChange: (value: string) => void;
@@ -10,6 +11,22 @@ interface EmojiPickerProps {
 
 const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
   const { isDark } = useThemeStore();
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!pickerRef.current) return;
+
+    pickerRef.current.innerHTML = "";
+
+    const picker = new Picker({
+      data,
+      theme: isDark ? "dark" : "light",
+      emojiSize: 24,
+      onEmojiSelect: (emoji: any) => onChange(emoji.native),
+    });
+
+    pickerRef.current.appendChild(picker as any);
+  }, [isDark, onChange]);
 
   return (
     <Popover>
@@ -17,17 +34,8 @@ const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
         <Smile className="size-4" />
       </PopoverTrigger>
 
-      <PopoverContent
-        side="right"
-        sideOffset={40}
-        className="bg-tranparent border-none shadow-none drop-shadow-none mb-12"
-      >
-        <Picker
-          theme={isDark ? "dark" : "light"}
-          data={data}
-          onEmojiSelect={(emoji: any) => onChange(emoji.native)}
-          emojiSize={24}
-        />
+      <PopoverContent className="bg-transparent border-none shadow-none">
+        <div ref={pickerRef} />
       </PopoverContent>
     </Popover>
   );
