@@ -153,8 +153,8 @@ export const useChatStore = create<ChatState>()(
       updateConversation: (conversation) => {
         set((state) => ({
           conversations: state.conversations.map((c) =>
-            c._id === conversation._id ? { ...c, ...conversation } : c
-          ),
+            c._id === (conversation as any)._id ? { ...c, ...(conversation as any) } : c
+          ),      
         }));
       },
       markAsSeen: async () => {
@@ -219,7 +219,7 @@ export const useChatStore = create<ChatState>()(
           );
 
           get().addConvo(conversation);
-// sau khi join conversation thì mới nhận đc tin nhắn 
+
           useSocketStore
             .getState()
             .socket?.emit("join-conversation", conversation._id);

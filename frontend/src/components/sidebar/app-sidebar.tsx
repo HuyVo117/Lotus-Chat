@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Moon, Sun } from "lucide-react";
-import { Switch } from "../ui/switch";
+import { Switch } from "@/components/ui/switch";
 import CreateNewChat from "../chat/CreateNewChat";
 import NewGroupChatModal from "../chat/NewGroupChatModal";
 import GroupChatList from "../chat/GroupChatList";
@@ -21,7 +21,7 @@ import AddFriendModal from "../chat/AddFriendModal";
 import DirectMessageList from "../chat/DirectMessageList";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import ConversationSkeleton from "../skeleton/ConversationSkeleton";
+import ConversationSkeleton from  "../skeleton/ConversationSkeleton"
 import { useChatStore } from "@/stores/useChatStore";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

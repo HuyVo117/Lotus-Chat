@@ -7,13 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { UserPlus, Users } from "lucide-react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import type { Friend } from "@/types/user";
-import IniviteSuggestionList from "../newGroupChat/IniviteSuggestionList";
+import IniviteSuggestionList from "../newGroupChat/IntiviteSuggestionList";
 import SelectedUsersList from "../newGroupChat/SelectedUsersList";
 import { toast } from "sonner";
 import { useChatStore } from "@/stores/useChatStore";
