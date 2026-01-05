@@ -5,10 +5,24 @@ import FriendRequest from "../models/FriendRequest.js";
 export const sendFriendRequest = async (req, res) => {
   try {
     const { to, message } = req.body;
-
     const from = req.user._id;
 
-    if (from === to) {
+    console.log("📨 sendFriendRequest called:", {
+      from: from?.toString(),
+      to,
+      toType: typeof to,
+      message,
+      body: req.body,
+      hasUser: !!req.user,
+    });
+
+    // Validate input
+    if (!to) {
+      console.error("❌ Missing 'to' field");
+      return res.status(400).json({ message: "Thiếu userId của người nhận (to)" });
+    }
+
+    if (from.toString() === to.toString()) {
       return res
         .status(400)
         .json({ message: "Không thể gửi lời mời kết bạn cho chính mình" });
@@ -17,6 +31,7 @@ export const sendFriendRequest = async (req, res) => {
     const userExists = await User.exists({ _id: to });
 
     if (!userExists) {
+      console.error("❌ User not found:", to);
       return res.status(404).json({ message: "Người dùng không tồn tại" });
     }
 
@@ -38,10 +53,12 @@ export const sendFriendRequest = async (req, res) => {
     ]);
 
     if (alreadyFriends) {
+      console.log("⚠️ Already friends");
       return res.status(400).json({ message: "Hai người đã là bạn bè" });
     }
 
     if (existingRequest) {
+      console.log("⚠️ Request already exists");
       return res.status(400).json({ message: "Đã có lời mời kết bạn đang chờ" });
     }
 
@@ -51,12 +68,14 @@ export const sendFriendRequest = async (req, res) => {
       message,
     });
 
+    console.log("✅ Friend request created:", request._id);
+
     return res
       .status(201)
       .json({ message: "Gửi lời mời kết bạn thành công", request });
   } catch (error) {
-    console.error("Lỗi khi gửi yêu cầu kết bạn", error);
-    return res.status(500).json({ message: "Lỗi hệ thống" });
+    console.error("❌ Lỗi khi gửi yêu cầu kết bạn:", error);
+    return res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
   }
 };
 
@@ -142,8 +161,8 @@ export const getAllFriends = async (req, res) => {
         },
       ],
     })
-      .populate("userA", "_id displayName avatarUrl")
-      .populate("userB", "_id displayName avatarUrl")
+      .populate("userA", "_id displayName avatarUrl username")
+      .populate("userB", "_id displayName avatarUrl username")
       .lean();
 
     if (!friendships.length) {

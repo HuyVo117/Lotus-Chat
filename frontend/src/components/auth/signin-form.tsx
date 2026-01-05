@@ -74,7 +74,7 @@ export function SigninForm({ className, ...props }: React.ComponentProps<"div">)
                 <Input
                   type="text"
                   id="username"
-                  placeholder="lotus"
+                  placeholder="Email adress or username"
                   {...register("username")}
                 />
                 {errors.username && (
@@ -95,6 +95,7 @@ export function SigninForm({ className, ...props }: React.ComponentProps<"div">)
                 <Input
                   type="password"
                   id="password"
+                  placeholder="Password"
                   {...register("password")}
                 />
                 {errors.password && (

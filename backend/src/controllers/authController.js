@@ -7,6 +7,7 @@ import Session from "../models/Session.js";
 
 const ACCESS_TOKEN_TTL = "30m"; // thuờng là dưới 15m
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 ngày
+const isProd = process.env.NODE_ENV === "production";
 
 export const signUp = async (req, res) => {
   try {
@@ -92,15 +93,15 @@ export const signIn = async (req, res) => {
     // trả refresh token về trong cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none", //backend, frontend deploy riêng
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
       maxAge: REFRESH_TOKEN_TTL,
     });
 
     // trả access token về trong res
     return res
       .status(200)
-      .json({ message: ` ${user.username} đã logged in!`, accessToken });
+      .json({ message: `User ${user.displayName} đã logged in!`, accessToken });
   } catch (error) {
     console.error("Lỗi khi gọi signIn", error);
     return res.status(500).json({ message: "Lỗi hệ thống" });
@@ -116,9 +117,12 @@ export const signOut = async (req, res) => {
       // xoá refresh token trong Session
       await Session.deleteOne({ refreshToken: token });
 
-      // xoá cookie
-      res.clearCookie("refreshToken");
-      
+      // xoá cookie với cùng options
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+      });
     }
 
     return res.sendStatus(204);

@@ -21,9 +21,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
+    if (!error.config) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config;
 
-    // những api không cần check
     if (
       originalRequest.url.includes("/auth/signin") ||
       originalRequest.url.includes("/auth/signup") ||
@@ -32,27 +35,32 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    originalRequest._retryCount = originalRequest._retryCount || 0;
+    originalRequest._retry = originalRequest._retry || false;
 
-    if (error.response?.status === 403 && originalRequest._retryCount < 4) {
-      originalRequest._retryCount += 1;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
       try {
-        const res = await api.post("/auth/refresh", { withCredentials: true });
-        const newAccessToken = res.data.accessToken;
+        const res = await api.post(
+          "/auth/refresh",
+          {},
+          { withCredentials: true }
+        );
 
+        const newAccessToken = res.data.accessToken;
         useAuthStore.getState().setAccessToken(newAccessToken);
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
-      } catch (refreshError) {
+      } catch (err) {
         useAuthStore.getState().clearState();
-        return Promise.reject(refreshError);
+        return Promise.reject(err);
       }
     }
 
     return Promise.reject(error);
   }
 );
+
 
 export default api;

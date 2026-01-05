@@ -81,6 +81,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                   <Input
                     type="text"
                     id="lastname"
+                    placeholder="Last Name"
                     {...register("lastname")}
                   />
 
@@ -100,6 +101,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                   <Input
                     type="text"
                     id="firstname"
+                    placeholder="First Name"
                     {...register("firstname")}
                   />
                   {errors.firstname && (
@@ -121,7 +123,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                 <Input
                   type="text"
                   id="username"
-                  placeholder="lotus"
+                  placeholder="Mobile number or username"
                   {...register("username")}
                 />
                 {errors.username && (
@@ -142,7 +144,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                 <Input
                   type="email"
                   id="email"
-                  placeholder="m@gmail.com"
+                  placeholder="Your email address"
                   {...register("email")}
                 />
                 {errors.email && (
@@ -161,6 +163,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                 <Input
                   type="password"
                   id="password"
+                  placeholder="Your password"
                   {...register("password")}
                 />
                 {errors.password && (
