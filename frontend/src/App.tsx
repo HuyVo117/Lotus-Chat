@@ -12,6 +12,7 @@ import { CallProvider } from "./contexts/CallContext";
 import CallModal from "./components/call/CallModal";
 import IncomingCallDialog from "./components/call/IncomingCallDialog";
 import { Buffer } from "buffer";
+import PremiumCheckoutPage from "./pages/PremiumCheckoutPage";
 
 // Polyfills cho simple-peer
 window.Buffer = Buffer;
@@ -61,6 +62,7 @@ function App() {
           {/* protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<ChatAppPage />} />
+              <Route path="/premium/checkout" element={<PremiumCheckoutPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
