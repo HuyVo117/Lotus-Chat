@@ -9,6 +9,20 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      buffer: "buffer",
+      stream: "stream-browserify",
+      process: "process/browser",
+    },
+  },
+  define: {
+    global: "globalThis",
+    "process.env": {},
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: "globalThis",
+      },
     },
   },
 });

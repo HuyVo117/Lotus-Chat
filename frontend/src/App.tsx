@@ -8,6 +8,27 @@ import { useThemeStore } from "./stores/useThemeStore";
 import { useEffect } from "react";
 import { useAuthStore } from "./stores/useAuthStore";
 import { useSocketStore } from "./stores/useSocketStore";
+import { CallProvider } from "./contexts/CallContext";
+import CallModal from "./components/call/CallModal";
+import IncomingCallDialog from "./components/call/IncomingCallDialog";
+import { Buffer } from "buffer";
+
+// Polyfills cho simple-peer
+window.Buffer = Buffer;
+
+// Polyfill process.nextTick
+if (!window.process) {
+  window.process = {
+    env: {},
+    nextTick: (callback: Function, ...args: any[]) => {
+      setTimeout(() => callback(...args), 0);
+    },
+  } as any;
+} else if (!window.process.nextTick) {
+  window.process.nextTick = (callback: Function, ...args: any[]) => {
+    setTimeout(() => callback(...args), 0);
+  };
+}
 
 function App() {
   const { isDark, setTheme } = useThemeStore();
@@ -27,30 +48,23 @@ function App() {
   }, [accessToken]);
 
   return (
-    <>
+    <CallProvider>
       <Toaster richColors />
+      <CallModal />
+      <IncomingCallDialog />
       <BrowserRouter>
         <Routes>
           {/* public routes */}
-          <Route
-            path="/signin"
-            element={<SignInPage />}
-          />
-          <Route
-            path="/signup"
-            element={<SignUpPage />}
-          />
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
 
-          {/* protectect routes */}
+          {/* protected routes */}
           <Route element={<ProtectedRoute />}>
-            <Route
-              path="/"
-              element={<ChatAppPage />}
-            />
+            <Route path="/" element={<ChatAppPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
-    </>
+    </CallProvider>
   );
 }
 
