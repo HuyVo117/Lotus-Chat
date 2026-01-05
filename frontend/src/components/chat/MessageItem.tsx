@@ -74,7 +74,22 @@ const MessageItem = ({
               message.isOwn ? "chat-bubble-sent border-0" : "chat-bubble-received"
             )}
           >
-            <p className="text-sm leading-relaxed break-words">{message.content}</p>
+            {/* Hiển thị ảnh nếu có */}
+            {message.imgUrl && (
+              <div className="mb-2">
+                <img
+                  src={message.imgUrl}
+                  alt="Message attachment"
+                  className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => window.open(message.imgUrl, "_blank")}
+                />
+              </div>
+            )}
+            
+            {/* Hiển thị text nếu có */}
+            {message.content && (
+              <p className="text-sm leading-relaxed break-words">{message.content}</p>
+            )}
           </Card>
 
           {/* seen/ delivered */}

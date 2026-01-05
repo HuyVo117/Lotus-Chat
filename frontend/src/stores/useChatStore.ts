@@ -11,7 +11,7 @@ export const useChatStore = create<ChatState>()(
       conversations: [],
       messages: {},
       activeConversationId: null,
-      convoLoading: false, // convo loading
+      convoLoading: false,
       messageLoading: false,
       loading: false,
 
@@ -84,34 +84,57 @@ export const useChatStore = create<ChatState>()(
           set({ messageLoading: false });
         }
       },
-      sendDirectMessage: async (recipientId, content, imgUrl) => {
+      sendDirectMessage: async (recipientId, content, image) => {
         try {
           const { activeConversationId } = get();
+          
+          let imgUrl: string | undefined;
+          
+          // Upload ảnh nếu có
+          if (image) {
+            console.log("📤 Uploading image...");
+            imgUrl = await chatService.uploadMessageImage(image);
+            console.log("✅ Image uploaded:", imgUrl);
+          }
+          
           await chatService.sendDirectMessage(
             recipientId,
             content,
             imgUrl,
             activeConversationId || undefined
           );
+          
           set((state) => ({
             conversations: state.conversations.map((c) =>
               c._id === activeConversationId ? { ...c, seenBy: [] } : c
             ),
           }));
         } catch (error) {
-          console.error("Lỗi xảy ra khi gửi direct message", error);
+          console.error("❌ Lỗi xảy ra khi gửi direct message", error);
+          throw error;
         }
       },
-      sendGroupMessage: async (conversationId, content, imgUrl) => {
+      sendGroupMessage: async (conversationId, content, image) => {
         try {
+          let imgUrl: string | undefined;
+          
+          // Upload ảnh nếu có
+          if (image) {
+            console.log("📤 Uploading image...");
+            imgUrl = await chatService.uploadMessageImage(image);
+            console.log("✅ Image uploaded:", imgUrl);
+          }
+          
           await chatService.sendGroupMessage(conversationId, content, imgUrl);
+          
           set((state) => ({
             conversations: state.conversations.map((c) =>
               c._id === get().activeConversationId ? { ...c, seenBy: [] } : c
             ),
           }));
         } catch (error) {
-          console.error("Lỗi xảy ra gửi group message", error);
+          console.error("❌ Lỗi xảy ra gửi group message", error);
+          throw error;
         }
       },
       addMessage: async (message) => {

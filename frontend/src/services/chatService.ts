@@ -64,4 +64,15 @@ export const chatService = {
     const res = await api.post("/conversations", { type, name, memberIds });
     return res.data.conversation;
   },
+  
+async uploadMessageImage(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+  
+  const res = await api.post("/messages/uploadImage", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  
+  return res.data.imgUrl;
+},
 };

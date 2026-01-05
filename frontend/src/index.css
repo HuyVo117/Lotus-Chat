@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "emoji-mart/css/emoji-mart.css";
 
 @custom-variant dark (&:is(.dark *));
 @config "../tailwind.config.ts";
