@@ -1,3 +1,4 @@
+// Update frontend/src/components/chat/ChatWindowLayout.tsx
 import { useChatStore } from "@/stores/useChatStore";
 import ChatWelcomeScreen from "./ChatWelcomeScreen";
 import { SidebarInset } from "../ui/sidebar";

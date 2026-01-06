@@ -3,6 +3,7 @@ import type { Conversation, Message, Participant } from "@/types/chat";
 import UserAvatar from "./UserAvatar";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
+import { Bot } from "lucide-react";
 
 interface MessageItemProps {
   message: Message;
@@ -32,6 +33,8 @@ const MessageItem = ({
   const participant = selectedConvo.participants.find(
     (p: Participant) => p._id.toString() === message.senderId.toString()
   );
+  
+  const isAIMessage = message.senderId === "ai-bot";
 
   return (
     <>
@@ -52,11 +55,17 @@ const MessageItem = ({
         {!message.isOwn && (
           <div className="w-8">
             {isGroupBreak && (
-              <UserAvatar
-                type="chat"
-                name={participant?.displayName ?? "Moji"}
-                avatarUrl={participant?.avatarUrl ?? undefined}
-              />
+              isAIMessage ? (
+                <div className="flex items-center justify-center size-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400">
+                  <Bot className="size-5 text-white" />
+                </div>
+              ) : (
+                <UserAvatar
+                  type="chat"
+                  name={participant?.displayName ?? "Moji"}
+                  avatarUrl={participant?.avatarUrl ?? undefined}
+                />
+              )
             )}
           </div>
         )}
@@ -81,7 +90,7 @@ const MessageItem = ({
                   src={message.imgUrl}
                   alt="Message attachment"
                   className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => window.open(message.imgUrl, "_blank")}
+                  onClick={() => message.imgUrl && window.open(message.imgUrl, "_blank")}
                 />
               </div>
             )}

@@ -1,4 +1,5 @@
 import { chatService } from "@/services/chatService";
+import { aiService } from "@/services/aiService";
 import type { ChatState } from "@/types/store";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -16,6 +17,65 @@ export const useChatStore = create<ChatState>()(
       loading: false,
 
       setActiveConversation: (id) => set({ activeConversationId: id }),
+      createAIConversation: () => {
+        const { conversations } = get();
+        const aiExists = conversations.find((c) => c._id === "ai-assistant");
+        
+        if (!aiExists) {
+          const aiConversation = {
+            _id: "ai-assistant",
+            type: "direct" as const,
+            group: { name: "", createdBy: "" },
+            participants: [
+              {
+                _id: "ai-bot",
+                displayName: "AI Assistant",
+                avatarUrl: null,
+                joinedAt: new Date().toISOString(),
+              },
+            ],
+            lastMessageAt: new Date().toISOString(),
+            seenBy: [],
+            lastMessage: {
+              _id: "welcome",
+              content: "Xin chào! Tôi là trợ lý AI của Lotus 🌸",
+              createdAt: new Date().toISOString(),
+              sender: {
+                _id: "ai-bot",
+                displayName: "AI Assistant",
+                avatarUrl: null,
+              },
+            },
+            unreadCounts: {},
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+          
+          set({ conversations: [aiConversation, ...conversations] });
+          
+          // Khởi tạo messages cho AI
+          const welcomeMessage = {
+            _id: "welcome",
+            conversationId: "ai-assistant",
+            senderId: "ai-bot",
+            content: "Xin chào! Tôi là trợ lý AI của Lotus. Tôi có thể giúp gì cho bạn hôm nay? 🌸",
+            imgUrl: null,
+            createdAt: new Date().toISOString(),
+            isOwn: false,
+          };
+          
+          set((state) => ({
+            messages: {
+              ...state.messages,
+              "ai-assistant": {
+                items: [welcomeMessage],
+                hasMore: false,
+                nextCursor: null,
+              },
+            },
+          }));
+        }
+      },
       reset: () => {
         set({
           conversations: [],
@@ -43,6 +103,11 @@ export const useChatStore = create<ChatState>()(
         const convoId = conversationId ?? activeConversationId;
 
         if (!convoId) return;
+
+        // Skip fetching messages for AI conversation
+        if (convoId === "ai-assistant") {
+          return;
+        }
 
         const current = messages?.[convoId];
         const nextCursor =
@@ -134,6 +199,79 @@ export const useChatStore = create<ChatState>()(
           }));
         } catch (error) {
           console.error("❌ Lỗi xảy ra gửi group message", error);
+          throw error;
+        }
+      },
+      sendAIMessage: async (content) => {
+        try {
+          const { user } = useAuthStore.getState();
+          if (!user) return;
+
+          // Thêm tin nhắn của user
+          const userMessage = {
+            _id: `user-${Date.now()}`,
+            conversationId: "ai-assistant",
+            senderId: user._id,
+            content,
+            imgUrl: null,
+            createdAt: new Date().toISOString(),
+            isOwn: true,
+          };
+
+          set((state) => ({
+            messages: {
+              ...state.messages,
+              "ai-assistant": {
+                items: [...(state.messages["ai-assistant"]?.items || []), userMessage],
+                hasMore: false,
+                nextCursor: null,
+              },
+            },
+          }));
+
+          // Gọi API AI thật
+          const response = await aiService.sendMessage(content);
+          
+          const aiMessage = {
+            _id: `ai-${Date.now()}`,
+            conversationId: "ai-assistant",
+            senderId: "ai-bot",
+            content: response.message,
+            imgUrl: null,
+            createdAt: new Date().toISOString(),
+            isOwn: false,
+          };
+
+          set((state) => ({
+            messages: {
+              ...state.messages,
+              "ai-assistant": {
+                items: [...(state.messages["ai-assistant"]?.items || []), aiMessage],
+                hasMore: false,
+                nextCursor: null,
+              },
+            },
+            conversations: state.conversations.map((c) =>
+              c._id === "ai-assistant"
+                ? {
+                    ...c,
+                    lastMessage: {
+                      _id: aiMessage._id,
+                      content: aiMessage.content,
+                      createdAt: aiMessage.createdAt,
+                      sender: {
+                        _id: "ai-bot",
+                        displayName: "AI Assistant",
+                        avatarUrl: null,
+                      },
+                    },
+                    lastMessageAt: aiMessage.createdAt,
+                  }
+                : c
+            ),
+          }));
+        } catch (error) {
+          console.error("❌ Lỗi xảy ra khi gửi AI message", error);
           throw error;
         }
       },

@@ -38,6 +38,7 @@ export interface ChatState {
 
   reset: () => void;
   setActiveConversation: (id: string | null) => void;
+  createAIConversation: () => void;
   fetchConversations: () => Promise<void>;
   fetchMessages: (conversationId?: string) => Promise<void>;
   sendDirectMessage: (
@@ -50,6 +51,7 @@ export interface ChatState {
     content: string,
     image?: File
   ) => Promise<void>;
+  sendAIMessage: (content: string) => Promise<void>;
   addMessage: (message: Message) => Promise<void>;
   updateConversation: (conversation: unknown) => void;
   markAsSeen: () => Promise<void>;

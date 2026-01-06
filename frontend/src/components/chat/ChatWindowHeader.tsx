@@ -8,7 +8,7 @@ import StatusBadge from "./StatusBadge";
 import GroupChatAvatar from "./GroupChatAvatar";
 import { useSocketStore } from "@/stores/useSocketStore";
 import { Button } from "../ui/button";
-import { Phone, Video } from "lucide-react";
+import { Phone, Video, Bot } from "lucide-react";
 import { toast } from "sonner";
 import { useCall } from "@/contexts/CallContext";
 
@@ -30,7 +30,10 @@ const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
     );
   }
 
-  if (chat.type === "direct") {
+  // Kiểm tra nếu là AI chat
+  const isAIChat = chat._id === "ai-assistant";
+
+  if (chat.type === "direct" && !isAIChat) {
     const otherUsers = chat.participants.filter((p) => p._id !== user?._id);
     otherUser = otherUsers.length > 0 ? otherUsers[0] : null;
 
@@ -75,7 +78,11 @@ const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
           <div className="p-2 flex items-center gap-3">
             {/* avatar */}
             <div className="relative">
-              {chat.type === "direct" ? (
+              {isAIChat ? (
+                <div className="flex items-center justify-center size-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400">
+                  <Bot className="size-6 text-white" />
+                </div>
+              ) : chat.type === "direct" ? (
                 <>
                   <UserAvatar
                     type={"sidebar"}
@@ -97,34 +104,45 @@ const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
             </div>
 
             {/* name */}
-            <h2 className="font-semibold text-foreground">
-              {chat.type === "direct" ? otherUser?.displayName : chat.group?.name}
-            </h2>
+            <div>
+              <h2 className="font-semibold text-foreground">
+                {isAIChat 
+                  ? "AI Assistant" 
+                  : chat.type === "direct" 
+                    ? otherUser?.displayName 
+                    : chat.group?.name}
+              </h2>
+              {isAIChat && (
+                <p className="text-xs text-muted-foreground">Trợ lý AI thông minh</p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Right side - Call buttons */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hover:bg-primary/10 transition-smooth"
-            onClick={handleVoiceCall}
-            title="Gọi thoại"
-          >
-            <Phone className="size-5" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hover:bg-primary/10 transition-smooth"
-            onClick={handleVideoCall}
-            title="Gọi video"
-          >
-            <Video className="size-5" />
-          </Button>
-        </div>
+        {/* Right side - Call buttons (không hiển thị cho AI chat) */}
+        {!isAIChat && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hover:bg-primary/10 transition-smooth"
+              onClick={handleVoiceCall}
+              title="Gọi thoại"
+            >
+              <Phone className="size-5" />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hover:bg-primary/10 transition-smooth"
+              onClick={handleVideoCall}
+              title="Gọi video"
+            >
+              <Video className="size-5" />
+            </Button>
+          </div>
+        )}
       </div>
     </header>
   );

@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
   const { user } = useAuthStore();
-  const { sendDirectMessage, sendGroupMessage } = useChatStore();
+  const { sendDirectMessage, sendGroupMessage, sendAIMessage } = useChatStore();
   const [value, setValue] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -18,6 +18,8 @@ const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!user) return;
+  
+  const isAIChat = selectedConvo._id === "ai-assistant";
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,7 +61,10 @@ const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
     setUploading(true);
 
     try {
-      if (selectedConvo.type === "direct") {
+      if (isAIChat) {
+        // Gửi tin nhắn cho AI
+        await sendAIMessage(currValue);
+      } else if (selectedConvo.type === "direct") {
         const participants = selectedConvo.participants;
         const otherUser = participants.filter((p) => p._id !== user._id)[0];
         await sendDirectMessage(otherUser._id, currValue, currImage || undefined);
@@ -123,15 +128,17 @@ const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
           disabled={uploading}
         />
         
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hover:bg-primary/10 transition-smooth"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-        >
-          <ImagePlus className="size-4" />
-        </Button>
+        {!isAIChat && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hover:bg-primary/10 transition-smooth"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <ImagePlus className="size-4" />
+          </Button>
+        )}
 
         <div className="flex-1 relative">
           <Input

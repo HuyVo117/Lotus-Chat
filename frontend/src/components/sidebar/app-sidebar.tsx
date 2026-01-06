@@ -1,3 +1,4 @@
+// Update frontend/src/components/sidebar/app-sidebar.tsx - Add AIChatCard
 import { NavUser } from "@/components/sidebar/nav-user";
 import {
   Sidebar,
@@ -19,9 +20,10 @@ import NewGroupChatModal from "../chat/NewGroupChatModal";
 import GroupChatList from "../chat/GroupChatList";
 import AddFriendModal from "../chat/AddFriendModal";
 import DirectMessageList from "../chat/DirectMessageList";
+import AIChatCard from "../chat/AIChatCard";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import ConversationSkeleton from  "../skeleton/ConversationSkeleton"
+import ConversationSkeleton from "../skeleton/ConversationSkeleton";
 import { useChatStore } from "@/stores/useChatStore";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -30,10 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { convoLoading } = useChatStore();
 
   return (
-    <Sidebar
-      variant="inset"
-      {...props}
-    >
+    <Sidebar variant="inset" {...props}>
       {/* Header */}
       <SidebarHeader>
         <SidebarMenu>
@@ -64,6 +63,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       {/* Content */}
       <SidebarContent className="beautiful-scrollbar">
+        {/* AI Assistant */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <AIChatCard />
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {/* New Chat */}
         <SidebarGroup>
           <SidebarGroupContent>
@@ -83,13 +89,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Dirrect Message */}
+        {/* Direct Message */}
         <SidebarGroup>
           <SidebarGroupLabel className="uppercase">bạn bè</SidebarGroupLabel>
-          <SidebarGroupAction
-            title="Kết Bạn"
-            className="cursor-pointer"
-          >
+          <SidebarGroupAction title="Kết Bạn" className="cursor-pointer">
             <AddFriendModal />
           </SidebarGroupAction>
 
